@@ -8,7 +8,7 @@ import java.util.*
 class ClientThread(val socket: Socket, val match: (HttpRequest) -> (HttpRequest, HttpResponse) -> Any) : Runnable {
 
     override fun run() {
-        val input = BufferedReader(InputStreamReader(socket.inputStream))
+        val input = BufferedReader(InputStreamReader(socket.inputStream, "ISO-8859-1"))
         val out = socket.outputStream
         val request = readRequest(input) {
             LinkedHashMap<String, String>().apply {
