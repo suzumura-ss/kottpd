@@ -1,6 +1,7 @@
 package com.github.gimlet2.kottpd
 
 import java.io.BufferedReader
+import java.io.InputStream
 import java.io.InputStreamReader
 import java.net.Socket
 import java.util.*
@@ -10,7 +11,7 @@ class ClientThread(val socket: Socket, val match: (HttpRequest) -> (HttpRequest,
     override fun run() {
         val input = BufferedReader(InputStreamReader(socket.inputStream, "ISO-8859-1"))
         val out = socket.outputStream
-        val request = readRequest(input) {
+        val request = readRequest(input, socket.inputStream) {
             LinkedHashMap<String, String>().apply {
                 input.lineSequence().takeWhile(String::isNotBlank).forEach { line ->
                     line.split(":").let {
@@ -28,9 +29,9 @@ class ClientThread(val socket: Socket, val match: (HttpRequest) -> (HttpRequest,
         socket.close()
     }
 
-    fun readRequest(reader: BufferedReader, eval: () -> Map<String, String>): HttpRequest {
+    fun readRequest(reader: BufferedReader, rawStream: InputStream, eval: () -> Map<String, String>): HttpRequest {
         reader.readLine().split(' ').let {
-            return HttpRequest(HttpMethod.valueOf(it[0]), it[1], it[2], eval(), reader)
+            return HttpRequest(HttpMethod.valueOf(it[0]), it[1], it[2], eval(), reader, rawStream)
         }
     }
 }
