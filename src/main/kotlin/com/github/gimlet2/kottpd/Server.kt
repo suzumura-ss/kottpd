@@ -175,8 +175,8 @@ class Server(val port: Int = (System.getProperty("server.port") ?: "9000").toInt
     }
 
     fun staticFiles(path: String) {
-        val fullPath = javaClass.getResource(path).file
-        File(fullPath)
+        javaClass.getResource(path)?.file?.let { fullPath ->
+            File(fullPath)
                 .walkTopDown()
                 .forEach {
                     if (!it.isDirectory) {
@@ -188,6 +188,7 @@ class Server(val port: Int = (System.getProperty("server.port") ?: "9000").toInt
                         }
                     }
                 }
+        }
     }
 }
 
